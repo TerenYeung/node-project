@@ -26,39 +26,36 @@ module.exports = App*/
 
 const fs = require('fs')
 const path = require('path')
+//发现是文件夹，首先查找pacckage.json里面的main，如果没有直接找js文件
+const staticServer = require('./static-server')
+console.log(staticServer)
 class App{
 	constructor(){}
 	initServer(){
 		//some code here
 		return (req,res)=>{
-			let {url} = req // ==> let url = req.url
-			/*let staticFunc = (url) = >{
-				if(url==''){
-					url = '/index.html'
-				}
-				fs.readFile(`./public${url}`,'utf-8',(err,data)=>{
+			let { url } = req
+			//DRY,don't repeat yourself
+			//const staticPrefix = path.resolve(process.cwd(),'public')
+			let body = staticServer(url)
+			res.end(body)
+			/*
+			if(url == '/css/index.css'){
+				fs.readFile('./public/css/index.css','utf8',(err,data)=>{
 					res.end(data)
 				})
-			}*/
-			let getPath = (url)=>{
-				return path.resolve(process.cwd(),`/public${url}`)
 			}
-			staticFunc(url)
-			// if(url == '/css/index.css'){
-			// 	fs.readFile('./publick/css/index.css','utf-8',(err,data)=>{
-			// 		res.end(data)
-			// 	})
-			// }
-			// if(url == '/js/index.js'){
-			// 	fs.readFile('./publick/css/index.css','utf-8',(err,data)=>{
-			// 		res.end(data)
-			// 	})
-			// }
-			// if(url == '/'){
-			// 	fs.readFile('./publick/index.html','utf-8',(err,data)=>{
-			// 		res.end(data)
-			// 	})
-			// }			
+			if(url == '/js/index.js'){
+				fs.readFile('./public/js/index.js','utf8',(err,data)=>{
+					res.end(data)
+				})
+			}
+			//fs相对于node的启动目录，即process.cwd()
+			if(url == '/'){
+				fs.readFile('./public/index.html','utf8',(err,data)=>{
+					res.end(data)
+				})				
+			}*/
 		}
 	}
 }
