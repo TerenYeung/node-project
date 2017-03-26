@@ -28,7 +28,7 @@ const fs = require('fs')
 const path = require('path')
 //发现是文件夹，首先查找pacckage.json里面的main，如果没有直接找js文件
 const staticServer = require('./static-server')
-console.log(staticServer)
+const apiServer = require('./api')
 class App{
 	constructor(){}
 	initServer(){
@@ -37,8 +37,34 @@ class App{
 			let { url } = req
 			//DRY,don't repeat yourself
 			//const staticPrefix = path.resolve(process.cwd(),'public')
-			let body = staticServer(url)
-			res.end(body)
+			//所有以action结尾的url，认为他是ajax
+			
+			//课后作业：1.如果把apiServer和staticServer链接起来
+			/*2. apiServer.then(()=>{
+				staticServer()	
+			})
+			*/
+			//返回字符串或buffer
+			let body = ''
+			let headers = {}
+			if(url.match('action')){
+				apiServer(url).then(val=>{
+					body = JSON.stringify(val)
+					headers = {
+						'Content-Type':'application/json'
+					}
+						let finalHeader = Object.assign(headers,{'X-powered-by':'Node.js'})
+						res.writeHead(200,'resolve ok',finalHeader)
+						res.end(body)						
+				})									
+			}else{
+				//不然的话就是静态资源
+				body = staticServer(url).then(body=>{
+					let finalHeader = Object.assign(headers,{'X-powered-by':'Node.js'})
+					res.writeHead(200,'resolve ok',finalHeader)
+					res.end(body)					
+				})
+			}
 			/*
 			if(url == '/css/index.css'){
 				fs.readFile('./public/css/index.css','utf8',(err,data)=>{

@@ -11,15 +11,17 @@ let staticFunc = (url)=>{
 	if(url == '/'){
 		url = '/index.html'
 	}
-	// let _path = path.resolve(staticPrefix,`.${url}`)
-	let _path = getPath(url)
-	let body = ''
-	try{
-		body = fs.readFileSync(_path)
-	}catch(err){
-		body = 'NOT FOUND'
-	}
-	return body
+	// let _path = path.resolve(staticPrefixa,`.${url}`)
+
+	return new Promise((resolve,reject)=>{
+		let _path = getPath(url)
+		let	body = fs.readFile(_path,(err,data)=>{
+				if(err){
+					reject(`NOT FOUND${err.stack}`)
+				}
+				resolve(data)
+			})	
+	})
 	/*fs.readFile(_path,(err,data)=>{
 		if(err){
 			data = 'NOT FOUND'
