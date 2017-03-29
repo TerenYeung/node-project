@@ -13,9 +13,16 @@ setTimeout(()=>{
 			console.log(err)
 		}
 	})
+	//模拟post
 	$.ajax({
 		url:'/list.action',
-		method: 'get',
+		method: 'post',
+		headers:{
+			'content-type':'application/json'
+		},
+		data:JSON.stringify([
+			'name','teren'
+		]),
 		success: function(data){
 			// debugger;
 			var liStr = data.map((item)=>{

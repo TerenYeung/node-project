@@ -7,7 +7,8 @@ const path = require('path')
 let getPath = (url)=>{
 	return path.resolve(process.cwd(),'public',`.${url}`)
 }
-let staticFunc = (url)=>{
+let staticFunc = (req)=>{
+	let {url} = req
 	if(url == '/'){
 		url = '/index.html'
 	}
@@ -17,7 +18,7 @@ let staticFunc = (url)=>{
 		let _path = getPath(url)
 		let	body = fs.readFile(_path,(err,data)=>{
 				if(err){
-					reject(`NOT FOUND${err.stack}`)
+					resolve(`NOT FOUND${err.stack}`)
 				}
 				resolve(data)
 			})	

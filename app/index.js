@@ -24,17 +24,21 @@ class App {
 
 module.exports = App*/
 
+//流式操作
+//req -> url-parse -> api -> static-server -> app下的index.js
+
 const fs = require('fs')
 const path = require('path')
 //发现是文件夹，首先查找pacckage.json里面的main，如果没有直接找js文件
 const staticServer = require('./static-server')
 const apiServer = require('./api')
+const urlParser = require()
 class App{
 	constructor(){}
 	initServer(){
 		//some code here
 		return (req,res)=>{
-			let { url } = req
+			// let { url ,method} = req
 			//DRY,don't repeat yourself
 			//const staticPrefix = path.resolve(process.cwd(),'public')
 			//所有以action结尾的url，认为他是ajax
@@ -44,8 +48,33 @@ class App{
 				staticServer()	
 			})
 			*/
+
+			apiServer(req).then(val=>{
+				if(!val){
+					//Promise
+					return staticServer(req)
+				}else{
+					return val
+				}				
+			}).then(val=>{
+				let base = {'X-powered-by':'Node.js'}
+				let body = ''
+				//array
+				if( val instanceof Buffer ){
+					body = val
+				}else{
+					body = JSON.stringify(val)
+					let finalHeader = Object.assign(base,{
+						'Content-Type':'application/json'
+					})
+					res.writeHead(200,'resolve ok',finalHeader)
+				}
+				res.end(body)				
+			})
+
+
 			//返回字符串或buffer
-			let body = ''
+			/*let body = ''
 			let headers = {}
 			if(url.match('action')){
 				apiServer(url).then(val=>{
@@ -64,7 +93,7 @@ class App{
 					res.writeHead(200,'resolve ok',finalHeader)
 					res.end(body)					
 				})
-			}
+			}*/
 			/*
 			if(url == '/css/index.css'){
 				fs.readFile('./public/css/index.css','utf8',(err,data)=>{
